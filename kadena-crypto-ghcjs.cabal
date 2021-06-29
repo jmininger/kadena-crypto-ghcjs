@@ -15,8 +15,11 @@ library
                   , ghcjs-promise
                   , jsaddle
                   , text
-  default-language: Haskell2010
   js-sources:       js-bits/kadena-crypto.js
+  default-language: Haskell2010
+
+  if !impl(ghcjs) && !os(ghcjs)
+    buildable: False
 
 executable test
   main-is:          Test.hs
@@ -29,3 +32,6 @@ executable test
                   , kadena-crypto-ghcjs
                   , text
   default-language: Haskell2010
+
+  if !impl(ghcjs) && !os(ghcjs)
+    buildable: False
