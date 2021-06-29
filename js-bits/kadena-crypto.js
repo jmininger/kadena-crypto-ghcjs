@@ -225,8 +225,8 @@ const signing = require("./signing")
 const derivation = require("./key-derivation")
 const Module = require('../lib.js')
 
-async function kadenaMnemonicToRootKeypair(mnemonic) {
-  return derivation.mnemonicToRootKeypair(mnemonic, 3)
+function kadenaMnemonicToRootKeypair(mnemonic) {
+  return derivation.mnemonicToRootKeypairV3(mnemonic, '')
 }
 
 function kadenaGenMnemonic() {
@@ -247,6 +247,12 @@ function kadenaSign(msg, xprv) {
   return signing.sign(msgBuf, xprvBuf).buffer;
 }
 
+function kadenaGetPublic(prvKey) {
+  const prvBuffer = Buffer.from(prvKey)
+  const xpub = new Buffer(prvBuffer.slice(64, 96))
+  return xpub.buffer;
+}
+ 
 function kadenaVerify(msg, publicKey, sig) {
   const msgBuf = Buffer.from(msg);
   const pubKeyBuf = Buffer.from(publicKey);
@@ -258,6 +264,7 @@ module.exports = {
   kadenaGenMnemonic,
   kadenaMnemonicToRootKeypair,
   kadenaGenKeypair,
+  kadenaGetPublic,
   kadenaSign,
   kadenaVerify
 }
@@ -478,6 +485,7 @@ function cborEncodeBuffer(input) {
 
 module.exports = {
   mnemonicToRootKeypair,
+  mnemonicToRootKeypairV3,
   derivePublic,
   derivePrivate,
   toPublic,
@@ -17775,8 +17783,8 @@ module.exports = function (password, salt, iterations, keylen) {
   }
 }
 
-}).call(this,{"isBuffer":require("../../../../../../../../nix/store/y42lxz5r3xc8x79ainln7hfv7xlapz6l-node_browserify-16.5.2/lib/node_modules/browserify/node_modules/is-buffer/index.js")})
-},{"../../../../../../../../nix/store/y42lxz5r3xc8x79ainln7hfv7xlapz6l-node_browserify-16.5.2/lib/node_modules/browserify/node_modules/is-buffer/index.js":49}],27:[function(require,module,exports){
+}).call(this,{"isBuffer":require("../../../../../../../nix/store/y42lxz5r3xc8x79ainln7hfv7xlapz6l-node_browserify-16.5.2/lib/node_modules/browserify/node_modules/is-buffer/index.js")})
+},{"../../../../../../../nix/store/y42lxz5r3xc8x79ainln7hfv7xlapz6l-node_browserify-16.5.2/lib/node_modules/browserify/node_modules/is-buffer/index.js":49}],27:[function(require,module,exports){
 var md5 = require('create-hash/md5')
 var RIPEMD160 = require('ripemd160')
 var sha = require('sha.js')
@@ -19100,8 +19108,8 @@ module.exports = {
   validateUint32
 }
 
-}).call(this,{"isBuffer":require("../../../../../../nix/store/y42lxz5r3xc8x79ainln7hfv7xlapz6l-node_browserify-16.5.2/lib/node_modules/browserify/node_modules/is-buffer/index.js")})
-},{"../../../../../../nix/store/y42lxz5r3xc8x79ainln7hfv7xlapz6l-node_browserify-16.5.2/lib/node_modules/browserify/node_modules/is-buffer/index.js":49,"bip39":8}],41:[function(require,module,exports){
+}).call(this,{"isBuffer":require("../../../../../nix/store/y42lxz5r3xc8x79ainln7hfv7xlapz6l-node_browserify-16.5.2/lib/node_modules/browserify/node_modules/is-buffer/index.js")})
+},{"../../../../../nix/store/y42lxz5r3xc8x79ainln7hfv7xlapz6l-node_browserify-16.5.2/lib/node_modules/browserify/node_modules/is-buffer/index.js":49,"bip39":8}],41:[function(require,module,exports){
 
 },{}],42:[function(require,module,exports){
 'use strict'

@@ -24,14 +24,9 @@ in rp.project ({ pkgs, ... }: {
     kadena-crypto-ghcjs = gitignoreSource ./.;
   };
 
-  overrides = self: super: with pkgs.haskell.lib; {
-    ghcjs-promise = doJailbreak 
-      (self.callCabal2nix "ghcjs-promise" 
-        (thunkSource ./dep/ghcjs-promise) {});
-  };
-
   shells = {
     ghcjs = ["kadena-crypto-ghcjs" ];
+    ghc = ["kadena-crypto-ghcjs" ];
   };
 })
 
