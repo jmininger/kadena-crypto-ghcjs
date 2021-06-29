@@ -228,26 +228,18 @@ async function kadenaMnemonicToRootKeypair(mnemonic) {
   return derivation.mnemonicToRootKeypair(mnemonic, 3)
 }
 
-// root :: [Word8]
 function kadenaGenKeypair(root, index) {
   const derivationScheme = 2;
   const rootBuffer = Buffer.from(root)
   const xprv = derivation.derivePrivate(rootBuffer, index, derivationScheme);
-  // const xpub = xprv.slice(64, 96);
   const xpub = new Buffer(xprv.slice(64, 96))
-  console.log("Pub To String")
-  console.log(xpub.toString('hex'))
-  console.log("Pub buffer to String")
-  console.log(xpub.buffer.toString('hex'))
-  console.log("FINISHED")
-
   return [xprv.buffer, xpub.buffer];
 }
 
 function kadenaSign(msg, xprv) {
   const xprvBuf = Buffer.from(xprv);
   const msgBuf = Buffer.from(msg)
-  return signing.sign(msgBuf, xprvBuf);
+  return signing.sign(msgBuf, xprvBuf).buffer;
 }
 
 function kadenaVerify(msg, publicKey, sig) {
