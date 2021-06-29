@@ -220,12 +220,17 @@ module.exports = {
 }).call(this,require("buffer").Buffer)
 },{"../lib.js":6,"../utils/validation":40,"buffer":44}],2:[function(require,module,exports){
 (function (Buffer){
+const bip39 = require('bip39')
 const signing = require("./signing")
 const derivation = require("./key-derivation")
 const Module = require('../lib.js')
 
 async function kadenaMnemonicToRootKeypair(mnemonic) {
   return derivation.mnemonicToRootKeypair(mnemonic, 3)
+}
+
+function kadenaGenMnemonic() {
+  return bip39.generateMnemonic()
 }
 
 function kadenaGenKeypair(root, index) {
@@ -250,6 +255,7 @@ function kadenaVerify(msg, publicKey, sig) {
 }
 
 module.exports = {
+  kadenaGenMnemonic,
   kadenaMnemonicToRootKeypair,
   kadenaGenKeypair,
   kadenaSign,
@@ -257,7 +263,7 @@ module.exports = {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"../lib.js":6,"./key-derivation":3,"./signing":4,"buffer":44}],3:[function(require,module,exports){
+},{"../lib.js":6,"./key-derivation":3,"./signing":4,"bip39":8,"buffer":44}],3:[function(require,module,exports){
 (function (Buffer){
 const bip39 = require('bip39')
 

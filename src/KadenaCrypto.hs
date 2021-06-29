@@ -1,26 +1,28 @@
-{-# LANGUAGE JavaScriptFFI #-}
-{-# LANGUAGE TupleSections #-}
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE CPP                 #-}
+{-# LANGUAGE JavaScriptFFI       #-}
+{-# LANGUAGE LambdaCase          #-}
+{-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE TupleSections       #-}
 
-module KadenaCrypto (generateRoot, generateKeypair, sign, verify) where
+module KadenaCrypto (genMnemonic, generateRoot, generateKeypair, sign, verify) where
 
-import Data.Text (Text)
-import Data.ByteString (ByteString)
-import qualified Data.ByteString as BS
-import Data.Word (Word8)
-import Language.Javascript.JSaddle
-import Language.Javascript.JSaddle.Helper
-import Language.Javascript.JSaddle.Types (ghcjsPure)
-import GHCJS.Buffer
-import GHCJS.Foreign
-import Data.JSVal.Promise
-import Control.Monad.IO.Class
-import Data.Bits ((.|.))
+import           Control.Monad.IO.Class
+import           Data.Bits                          ((.|.))
+import           Data.ByteString                    (ByteString)
+import qualified Data.ByteString                    as BS
+import           Data.JSString.Text                 (textFromJSString)
+import           Data.JSVal.Promise                 (await)
+import           Data.Text                          (Text)
+import           Data.Word                          (Word8)
+import           GHCJS.Buffer                       (createFromArrayBuffer, freeze, toByteString)
+import           Language.Javascript.JSaddle
+import           Language.Javascript.JSaddle.Helper (mutableArrayBufferFromJSVal)
+import           Language.Javascript.JSaddle.Types  (ghcjsPure)
 
 #ifdef ghcjs_HOST_OS
+foreign import javascript unsafe "lib.kadenaGenMnemonic()"
+  kadenaGenMnemonic :: JSM JSString
 
 foreign import javascript unsafe "lib.kadenaMnemonicToRootKeypair($1).then(function(value){ return value.buffer; })"
   kadenaMnemonicToRootKeypair :: Text -> JSVal
@@ -51,21 +53,21 @@ awaitPromise rawProm =
 
 generateRoot :: Text -> JSM (Maybe ByteString)
 generateRoot phrase = do
-  mJSArr <- awaitPromise $ kadenaMnemonicToRootKeypair phrase 
+  mJSArr <- awaitPromise $ kadenaMnemonicToRootKeypair phrase
   case mJSArr of
     Just buf -> Just <$> arrayBufToByteString buf
-    Nothing -> pure Nothing
+    Nothing  -> pure Nothing
 
 -- TODO: Test empty bs, test various int values
 generateKeypair :: ByteString -> Int -> JSM (Maybe (ByteString, ByteString))
 generateKeypair root idx = do
   rootBuf <- toJSVal $ BS.unpack root
   let idx' = fromIntegral $ 0x80000000 .|. idx
-  res <- fromJSVal $ kadenaGenKeypair rootBuf idx' 
+  res <- fromJSVal $ kadenaGenKeypair rootBuf idx'
   case res of
     Nothing -> pure Nothing
-    Just (prvJS, pubJS) -> fmap Just $ 
-      (,) 
+    Just (prvJS, pubJS) -> fmap Just $
+      (,)
         <$> arrayBufToByteString prvJS
         <*> arrayBufToByteString pubJS
 
@@ -81,5 +83,10 @@ verify msg pub sig = do
   pubBuf <- toJSVal $ BS.unpack pub
   sigBuf <- toJSVal $ BS.unpack sig
   return $ kadenaVerify msgBuf pubBuf sigBuf
+
+genMnemonic :: JSM Text
+genMnemonic = do
+  mnemonic <- kadenaGenMnemonic
+  pure $ textFromJSString mnemonic
 
 #endif
